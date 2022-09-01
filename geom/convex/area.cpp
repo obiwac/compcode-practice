@@ -1,6 +1,8 @@
-#include <iostream>
-#include <vector>
+#include <execution>
 #include <cmath>
+#include <iostream>
+#include <numeric>
+#include <vector>
 
 using namespace std;
 
@@ -53,8 +55,6 @@ ostream& operator<<(ostream& stream, Vertex vert) {
 
 struct Polygon {
 	vector<Vertex> verts;
-	vector<pair<int, int>> edges;
-
 	Vertex centre;
 
 	Polygon(vector<Vertex> verts) :
@@ -86,6 +86,21 @@ struct Polygon {
 
 		sort(this->verts.begin(), this->verts.end(), key);
 	}
+
+	float area(void) {
+		// construct triangle fan and sum up each triangle's area
+
+		float area = 0;
+
+		for (size_t i = 0; i < verts.size(); i++) {
+			const Vertex& a = verts[i];
+			const Vertex& b = verts[(i + 1) % verts.size()];
+
+			area += a.dist * b.dist * sin(b.theta - a.theta) / 2;
+		}
+
+		return area;
+	}
 };
 
 ostream& operator<<(ostream& stream, Polygon poly) {
@@ -104,5 +119,7 @@ int main(void) {
 	Polygon poly(verts);
 
 	cout << poly << endl;
+	cout << poly.area() << endl;
+
 	return 0;
 }
