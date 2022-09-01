@@ -1,5 +1,7 @@
 #include <cmath>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <queue>
 #include <vector>
@@ -90,10 +92,27 @@ void dijkstra(Graph& graph, int start, int dest) {
 }
 
 int main(void) {
-	vector<City> cities = {
-		City("Brussels", 0, 0, 0),
-		City("Antwerp", 0, 0, 0),
-	};
+	vector<City> cities;
+
+	// read cities CSV file
+
+	ifstream file("be.csv");
+	file.ignore(numeric_limits<streamsize>::max(), file.widen('\n')); // discard first row
+
+	for (string row; getline(file, row);) {
+		vector<string> bits;
+
+		string tmp;
+		stringstream stream(row);
+
+		while (getline(stream, tmp, ',')) {
+			bits.push_back(tmp);
+		}
+
+		cities.push_back(City(bits[0], stoi(bits[8]), stoi(bits[1]), stoi(bits[2])));
+	}
+
+	file.close();
 
 	// build graph from cities
 	// weights are simply the distances between cities
