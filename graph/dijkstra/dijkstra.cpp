@@ -113,14 +113,16 @@ int main(void) {
 
 		string name = bits[0];
 		int pop = stoi(bits[8]);
-		float lat = stoi(bits[1]);
-		float lon = stoi(bits[2]);
+		float lat = stof(bits[1]);
+		float lon = stof(bits[2]);
 
 		table[name] = cities.size();
 		cities.push_back(City(name, pop, lat, lon));
 	}
 
 	file.close();
+
+	cout << cities << endl;
 
 	// build graph from cities
 	// weights are simply the distances between cities
@@ -132,14 +134,14 @@ int main(void) {
 			auto city1 = cities[i];
 			auto city2 = cities[j];
 
-			float weight = city1.dist(city2);
+			float weight = city1.dist(city2); // TODO include city population in weight measurement (privilege larger cities)
 			edges.push_back(Edge(i, j, weight));
 		}
 	}
 
 	Graph graph(cities.size(), edges);
 
-	// find shortest distance between Gent & Arlon
+	// find shortest path between Knokke-Heist & Arlon
 
 	dijkstra(graph, table["Gent"], table["Arlon"]);
 
