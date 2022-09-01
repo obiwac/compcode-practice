@@ -1,6 +1,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <queue>
@@ -92,6 +93,7 @@ void dijkstra(Graph& graph, int start, int dest) {
 }
 
 int main(void) {
+	map<string, int> table;
 	vector<City> cities;
 
 	// read cities CSV file
@@ -109,7 +111,13 @@ int main(void) {
 			bits.push_back(tmp);
 		}
 
-		cities.push_back(City(bits[0], stoi(bits[8]), stoi(bits[1]), stoi(bits[2])));
+		string name = bits[0];
+		int pop = stoi(bits[8]);
+		float lat = stoi(bits[1]);
+		float lon = stoi(bits[2]);
+
+		table[name] = cities.size();
+		cities.push_back(City(name, pop, lat, lon));
 	}
 
 	file.close();
@@ -130,7 +138,10 @@ int main(void) {
 	}
 
 	Graph graph(cities.size(), edges);
-	cout << graph << endl;
+
+	// find shortest distance between Gent & Arlon
+
+	dijkstra(graph, table["Gent"], table["Arlon"]);
 
 	return 0;
 }
