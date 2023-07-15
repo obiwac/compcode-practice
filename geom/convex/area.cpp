@@ -4,7 +4,7 @@
 
 using namespace std;
 
-// generic stream overload
+// generic stream overload for vectors
 
 template<class T> ostream& operator<<(ostream& stream, vector<T> vec) {
 	for (size_t i = 0; i < vec.size(); i++) {
@@ -107,14 +107,12 @@ ostream& operator<<(ostream& stream, Polygon poly) {
 }
 
 int main(void) {
-	vector<Vertex> verts = {
+	Polygon poly({
 		Vertex(0, 0),
 		Vertex(0, 1),
 		Vertex(1, 1),
 		Vertex(1, 0),
-	};
-
-	Polygon poly(verts);
+	});
 
 	cout << poly << endl;
 	cout << poly.area() << endl;

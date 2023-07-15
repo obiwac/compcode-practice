@@ -22,94 +22,22 @@ template<class T> ostream& operator<<(ostream& stream, vector<T> vec) {
 
 // "classes" (really structs, so things are public by default)
 
-struct Node {
-	map<int, float> neighbours;
+struct Edge {
+	pair<int, int> verts;
+	float weight;
 
-	void edge(int other, float weight) {
-		map[other] = weight;
+	Edge(int vert1, int vert2, float weight) {
+		verts = { vert1, vert2 };
+		this->weight = weight;
 	}
 };
 
-ostream& operator<<(ostream& stream, Node& vert) {
-	stream << "Node(" << vert.neighbours.size() << " neighbours)";
+ostream& operator<<(ostream& stream, Edge& edge) {
+	stream << "Edge(" << edge.weight << ", " << edge.verts.first << " -> " << edge.verts.second << ")";
 	return stream;
 }
 
-struct Graph {
-	vector<Node*> nodes;
-
-	template<class T> Graph(vector<T> nodes) {
-		for (T& node : nodes) {
-			this->nodes.push_back(&node);
-		}
-	}
-
-	// TODO make these arguments Node&
-
-	void dijkstra(int start, int dest) {
-		// TODO make this is an operator of struct Node, like in https://en.cppreference.com/w/cpp/container/priority_queue/emplace
-
-		auto lambda = [](pair<int, float> a, pair<int, float> b) -> bool {
-			return a.second > b.second; // TODO are you sure this is the right way round?
-		};
-
-		priority_queue<pair<int, float>, vector<pair<int, float>>, decltype(lambda)> unvisited(lambda);
-		float dists[nodes.size()];
-
-		// we know the distance of the start node to itself though
-		// it's zero incase you haven't figured it out yet
-
-		dists[start] = 0;
-
-		// add all other nodes to unvisited set (a priority queue to make things speedy)
-		// also give them all an infinite distance from the start node to start off with
-		// this will be refined in later steps of the algorithm
-
-		for (size_t i = 0; i < nodes.size(); i++) {
-			Node& node = nodes[i];
-
-			if (i != start) {
-				dists[i] = numeric_limits<float>::infinity();
-			}
-
-			unvisited.push({ i, dists[i] });
-		}
-
-		// we know the distance of the start node to itself though
-		// it's zero incase you haven't figured it out yet
-
-		dists[start] = 0;
-		int current = start;
-
-		// continue until there are no more unvisited nodes to visit
-
-		while (!unvisited.empty()) {
-			// get the unvisited node with the current minimum distance
-
-			int i = unvisited.top().first;
-			unvisited.pop();
-			Node& node = *nodes[i];
-
-			// go through all of its neighbours
-
-			for (auto& [ neighbour, weight ] : node.neighbours) {
-				float dist = dists[i] + weight;
-
-				if (dist < dists[neighbour]) {
-					dists[neighbour] = dist;
-					// unvisited.
-				}
-			}
-		}
-	}
-};
-
-ostream& operator<<(ostream& stream, Graph& graph) {
-	stream << "Graph(" << graph.nodes.size() << " nodes)";
-	return stream;
-}
-
-struct City : Node {
+struct City {
 	string name;
 	int pop;
 	float lat, lon;
@@ -139,6 +67,64 @@ struct City : Node {
 
 ostream& operator<<(ostream& stream, City& city) {
 	stream << "City(" << city.name << ")";
+	return stream;
+}
+
+struct Graph {
+	int vert_len;
+	vector<Edge> edges;
+
+	Graph(int vert_len, vector<Edge> edges) {
+		this->vert_len = vert_len;
+		this->edges = edges;
+	}
+
+	void dijkstra(Graph& graph, int start, int dest) {
+		// add all vertices to unvisited set (a priority queue to make things speedy)
+		// also give them all an infinite distance from the start vertex to start off with
+		// this will be refined in later steps of the algorithm
+
+		auto lambda = [](const Edge& a, const Edge& b) -> bool {
+			return a.weight > b.weight;
+		};
+
+		priority_queue<Edge&, vector<Edge&>, decltype(lambda)> unvisited;
+
+		unvisited.push();
+
+
+
+
+		float dists[graph.vert_len];
+
+		for (size_t i = 0; i < graph.vert_len; i++) {
+			unvisited.push(i);
+			dists[i] = numeric_limits<float>::infinity();
+		}
+
+		// we know the distance of the start vertex to itself though
+		// it's zero incase you haven't figured it out yet
+
+		dists[start] = 0;
+		int current = start;
+
+		// continue until there are no more unvisited vertices to visit:
+		// TODO explain in comment
+
+		while (!unvisited.empty()) {
+			int vert = unvisited.pop();
+
+
+		}
+	}
+};
+
+ostream& operator<<(ostream& stream, Graph& graph) {
+	stream << "Graph("
+		<< graph.vert_len << " vertices, "
+		<< graph.edges.size() << " edges, "
+		<< graph.edges << ")";
+
 	return stream;
 }
 
@@ -172,23 +158,24 @@ int main(void) {
 
 	file.close();
 
+	cout << cities << endl;
+
 	// build graph from cities
 	// weights are simply the distances between cities
 
-	for (auto& city : cities) {
-		for (size_t i = 0; i < cities.size(); i++) {
-			Node& other = cities[i];
+	vector<Edge> edges;
 
-			if (&city == &other) {
-				continue;
-			}
+	for (size_t i = 0; i < cities.size(); i++) {
+		for (size_t j = i + 1; j < cities.size(); j++) {
+			auto city1 = cities[i];
+			auto city2 = cities[j];
 
-			float weight = city.dist(other); // TODO include city population in weight measurement (privilege larger cities)
-			city.edge(i, weight);
+			float weight = city1.dist(city2); // TODO include city population in weight measurement (privilege larger cities)
+			edges.push_back(Edge(i, j, weight));
 		}
 	}
 
-	Graph graph(cities);
+	Graph graph(cities.size(), edges);
 
 	// find shortest path between Knokke-Heist & Arlon
 
