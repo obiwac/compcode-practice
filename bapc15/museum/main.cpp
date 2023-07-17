@@ -3,14 +3,6 @@
 
 using namespace std;
 
-struct Tri {
-	pair<int, int> a, b, c;
-
-	bool operator==(Tri const& other) const {
-		return a == other.a and b == other.b and c == other.c;
-	}
-};
-
 int main(void) {
 	size_t t;
 	cin >> t;
