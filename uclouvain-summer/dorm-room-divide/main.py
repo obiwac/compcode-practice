@@ -27,7 +27,7 @@ for i in range(1, n - 1):
 	# get area of triangle
 	# shoelace method too because I'm lazy
 
-	area = shoelace((a,b , c))
+	area = shoelace((a, b, c))
 	left = (total / 2 - accum) / area
 
 	if left <= 1:
